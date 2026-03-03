@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate BolBaat Icons</title></head>
+<body>
+<h2>BolBaat Icon Generator</h2>
+<p>Right-click each image below and "Save image as..." to save them.</p>
+<h3>192x192</h3>
+<canvas id="c192" width="192" height="192"></canvas>
+<h3>512x512</h3>
+<canvas id="c512" width="512" height="512"></canvas>
+
+<script>
+function drawIcon(canvas) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, s, s);
+  grad.addColorStop(0, '#6c63ff');
+  grad.addColorStop(1, '#8b83ff');
+
+  // Rounded rect
+  const r = s * 0.188;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(s - r, 0);
+  ctx.quadraticCurveTo(s, 0, s, r);
+  ctx.lineTo(s, s - r);
+  ctx.quadraticCurveTo(s, s, s - r, s);
+  ctx.lineTo(r, s);
+  ctx.quadraticCurveTo(0, s, 0, s - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Speech bubble
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.beginPath();
+  const cx = s/2, cy = s*0.44;
+  const rx = s*0.32, ry = s*0.22;
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Tail
+  ctx.beginPath();
+  ctx.moveTo(s*0.3, cy + ry*0.7);
+  ctx.lineTo(s*0.22, s*0.78);
+  ctx.lineTo(s*0.4, cy + ry*0.5);
+  ctx.closePath();
+  ctx.fill();
+
+  // Text "BB"
+  ctx.fillStyle = '#6c63ff';
+  ctx.font = `900 ${s*0.2}px Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('BB', cx, cy);
+}
+
+drawIcon(document.getElementById('c192'));
+drawIcon(document.getElementById('c512'));
+
+// Auto-download
+['c192', 'c512'].forEach(id => {
+  const canvas = document.getElementById(id);
+  const link = document.createElement('a');
+  link.download = `icon-${canvas.width}.png`;
+  link.href = canvas.toDataURL('image/png');
+  // link.click(); // Uncomment to auto-download
+});
+</script>
+</body>
+</html>

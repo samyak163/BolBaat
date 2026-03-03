@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c63ff"/>
+      <stop offset="100%" style="stop-color:#8b83ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Speech bubble -->
+  <path d="M256 100c-88.4 0-160 60.3-160 134.7 0 42.7 24 80.3 61.3 105.3L140 400l72-36c14 3.7 28.7 5.3 44 5.3 88.4 0 160-60.3 160-134.7S344.4 100 256 100z" fill="white" opacity="0.95"/>
+  <!-- BB text -->
+  <text x="256" y="262" font-family="Arial,sans-serif" font-weight="900" font-size="100" fill="#6c63ff" text-anchor="middle" dominant-baseline="central">BB</text>
+</svg>
