@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bolbaat-v1';
+const CACHE_NAME = 'bolbaat-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './js/scenarios.js',
   './js/ai.js',
   './js/chat.js',
+  './js/voice.js',
   './js/wordbank.js',
   './js/grammar.js',
   './manifest.json'

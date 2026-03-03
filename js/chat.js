@@ -11,6 +11,7 @@ const Chat = {
     document.getElementById('header-title').textContent = this.currentScenario.title;
     document.getElementById('header-actions').innerHTML =
       `<button class="header-btn lang-toggle-btn" onclick="Chat.toggleLang()">${language === 'hindi' ? 'HI' : 'EN'}</button>` +
+      `<button class="header-btn voice-btn" onclick="Voice.open('${scenarioId}', '${language}')" title="Voice Mode">🎙️</button>` +
       `<button class="header-btn close-btn" onclick="Chat.close()">✕</button>`;
 
     App.navigate('chat');

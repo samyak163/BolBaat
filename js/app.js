@@ -24,10 +24,13 @@ const HomeScreen = {
 
       for (const s of scenarios) {
         html +=
-          '<div class="scenario-card" onclick="Chat.open(\'' + s.id + '\', \'' + lang + '\')">' +
-          '  <span class="scenario-emoji">' + s.emoji + '</span>' +
-          '  <span class="scenario-title">' + s.title + '</span>' +
-          '  <span class="scenario-desc">' + s.desc + '</span>' +
+          '<div class="scenario-card">' +
+          '  <div class="scenario-card-main" onclick="Chat.open(\'' + s.id + '\', \'' + lang + '\')">' +
+          '    <span class="scenario-emoji">' + s.emoji + '</span>' +
+          '    <span class="scenario-title">' + s.title + '</span>' +
+          '    <span class="scenario-desc">' + s.desc + '</span>' +
+          '  </div>' +
+          '  <button class="scenario-voice-btn" onclick="event.stopPropagation(); Voice.open(\'' + s.id + '\', \'' + lang + '\')" title="Voice Mode">🎙️</button>' +
           '</div>';
       }
 
@@ -188,12 +191,13 @@ const App = {
       wordbank: 'Word Bank',
       grammar: 'Grammar Zone',
       settings: 'Settings',
-      chat: 'Chat'
+      chat: 'Chat',
+      voice: 'Voice Mode'
     };
     document.getElementById('header-title').textContent = titles[screen] || 'BolBaat';
 
-    // Show/hide bottom nav during chat
-    document.getElementById('bottom-nav').classList.toggle('hidden', screen === 'chat');
+    // Show/hide bottom nav during chat and voice
+    document.getElementById('bottom-nav').classList.toggle('hidden', screen === 'chat' || screen === 'voice');
 
     // Render screen
     this.renderScreen(screen);
