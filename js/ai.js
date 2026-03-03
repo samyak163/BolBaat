@@ -1,3 +1,17 @@
+// GitHub Copilot available models (for the model picker)
+const GITHUB_MODELS = [
+  { id: 'gpt-4o', name: 'GPT-4o', desc: 'Best quality (OpenAI)' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', desc: 'Fast & cheap (OpenAI)' },
+  { id: 'gpt-4.1', name: 'GPT-4.1', desc: 'Latest GPT (OpenAI)' },
+  { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', desc: 'Fast latest (OpenAI)' },
+  { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', desc: 'Fastest (OpenAI)' },
+  { id: 'o4-mini', name: 'o4-mini', desc: 'Reasoning model (OpenAI)' },
+  { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', desc: 'Great at languages (Anthropic)' },
+  { id: 'claude-sonnet-4', name: 'Claude Sonnet 4', desc: 'Latest Claude (Anthropic)' },
+  { id: 'Meta-Llama-3.1-405B-Instruct', name: 'Llama 3.1 405B', desc: 'Open source giant (Meta)' },
+  { id: 'Mistral-large-2411', name: 'Mistral Large', desc: 'Strong multilingual (Mistral)' },
+];
+
 const AI = {
   async sendMessage(systemPrompt, messages) {
     const settings = Storage.getSettings();
@@ -13,6 +27,8 @@ const AI = {
           return await this._openai(systemPrompt, messages, settings);
         case 'claude':
           return await this._claude(systemPrompt, messages, settings);
+        case 'github':
+          return await this._github(systemPrompt, messages, settings);
         default:
           return { error: 'Unknown provider: ' + settings.provider };
       }
@@ -103,6 +119,35 @@ const AI = {
     if (data.error) return { error: data.error.message };
     const text = data.content?.[0]?.text;
     if (!text) return { error: 'Empty response from Claude' };
+    return { text };
+  },
+
+  async _github(systemPrompt, messages, settings) {
+    const model = settings.model || 'gpt-4o-mini';
+    const apiMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages.map((m) => ({ role: m.role, content: m.content }))
+    ];
+
+    // GitHub Models API (OpenAI-compatible format)
+    const res = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + settings.apiKey
+      },
+      body: JSON.stringify({
+        model,
+        messages: apiMessages,
+        temperature: 0.8,
+        max_tokens: 1024
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) return { error: data.error.message || data.error };
+    const text = data.choices?.[0]?.message?.content;
+    if (!text) return { error: 'Empty response from GitHub Models' };
     return { text };
   },
 

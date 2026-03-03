@@ -57,26 +57,56 @@ const SettingsScreen = {
     const progress = Storage.getProgress();
     const wordCount = Storage.getWordBank().length;
 
+    const isGitHub = settings.provider === 'github';
+
+    // Build model selector: dropdown for GitHub, text input for others
+    let modelHtml;
+    if (isGitHub) {
+      modelHtml =
+        '    <label>Model</label>' +
+        '    <select id="setting-model" onchange="SettingsScreen.save()">' +
+        GITHUB_MODELS.map((m) =>
+          '      <option value="' + m.id + '"' + (settings.model === m.id ? ' selected' : '') + '>' +
+          m.name + ' — ' + m.desc + '</option>'
+        ).join('') +
+        '    </select>';
+    } else {
+      modelHtml =
+        '    <label>Model <span class="optional">(optional)</span></label>' +
+        '    <input type="text" id="setting-model" value="' + (settings.model || '') + '"' +
+        '      placeholder="Leave empty for default" onchange="SettingsScreen.save()">' +
+        '    <p class="setting-hint">Defaults: gemini-2.0-flash / gpt-4o-mini / claude-sonnet-4-6</p>';
+    }
+
+    // Key label and help link
+    const keyLabel = isGitHub ? 'GitHub Personal Access Token' : 'API Key';
+    const keyPlaceholder = isGitHub ? 'ghp_xxxxxxxxxxxxxxxxxxxx' : 'Enter your API key';
+    const keyHelp = isGitHub
+      ? '    <div class="github-help">' +
+        '      <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener" class="help-link">Create token on GitHub</a>' +
+        '      <p class="setting-hint">Free with GitHub Student Developer Pack. No special scopes needed — just create a token and paste it here.</p>' +
+        '    </div>'
+      : '';
+
     container.innerHTML =
       '<div class="settings-container">' +
       '  <div class="settings-section">' +
       '    <h3>AI Provider</h3>' +
       '    <label>Provider</label>' +
-      '    <select id="setting-provider" onchange="SettingsScreen.save()">' +
-      '      <option value="gemini"' + (settings.provider === 'gemini' ? ' selected' : '') + '>Google Gemini (Free tier available)</option>' +
+      '    <select id="setting-provider" onchange="SettingsScreen.onProviderChange()">' +
+      '      <option value="github"' + (settings.provider === 'github' ? ' selected' : '') + '>GitHub Copilot (Free for students!)</option>' +
+      '      <option value="gemini"' + (settings.provider === 'gemini' ? ' selected' : '') + '>Google Gemini (Free tier)</option>' +
       '      <option value="openai"' + (settings.provider === 'openai' ? ' selected' : '') + '>OpenAI (GPT)</option>' +
       '      <option value="claude"' + (settings.provider === 'claude' ? ' selected' : '') + '>Claude (Anthropic)</option>' +
       '    </select>' +
-      '    <label>API Key</label>' +
+      '    <label>' + keyLabel + '</label>' +
       '    <div class="api-key-field">' +
       '      <input type="password" id="setting-apikey" value="' + (settings.apiKey || '') + '"' +
-      '        placeholder="Enter your API key" onchange="SettingsScreen.save()">' +
+      '        placeholder="' + keyPlaceholder + '" onchange="SettingsScreen.save()">' +
       '      <button class="toggle-key-btn" onclick="SettingsScreen.toggleKeyVisibility()">Show</button>' +
       '    </div>' +
-      '    <label>Model <span class="optional">(optional)</span></label>' +
-      '    <input type="text" id="setting-model" value="' + (settings.model || '') + '"' +
-      '      placeholder="Leave empty for default" onchange="SettingsScreen.save()">' +
-      '    <p class="setting-hint">Defaults: gemini-2.0-flash / gpt-4o-mini / claude-sonnet-4-6</p>' +
+      keyHelp +
+      modelHtml +
       '  </div>' +
       '  <div class="settings-section">' +
       '    <h3>Preferences</h3>' +
@@ -113,15 +143,26 @@ const SettingsScreen = {
   },
 
   save() {
+    const modelEl = document.getElementById('setting-model');
     const settings = {
       provider: document.getElementById('setting-provider').value,
       apiKey: document.getElementById('setting-apikey').value,
-      model: document.getElementById('setting-model').value,
+      model: modelEl ? modelEl.value : '',
       defaultLang: document.getElementById('setting-lang').value,
       theme: document.getElementById('setting-theme').value
     };
     Storage.saveSettings(settings);
     App.applyTheme();
+  },
+
+  onProviderChange() {
+    // Save current provider selection, clear model (each provider has different models)
+    const newProvider = document.getElementById('setting-provider').value;
+    const settings = Storage.getSettings();
+    settings.provider = newProvider;
+    settings.model = ''; // Reset model when switching providers
+    Storage.saveSettings(settings);
+    this.render(); // Re-render to show correct model picker
   },
 
   toggleKeyVisibility() {
